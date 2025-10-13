@@ -1,15 +1,17 @@
+import { Image } from 'expo-image';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import {StyleSheet, View, Text } from 'react-native';
 import Slider from '@react-native-community/slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
 export default function ColorSliderScreen() {
-  // 1. Estados para guardar los valores de cada color (0-255)
+//constantes
   const [red, setRed] = useState(128);
   const [green, setGreen] = useState(128);
   const [blue, setBlue] = useState(128);
 
-  // 2. Hook para cargar los colores guardados cuando la app inicia
+  // carga los colroes
   useEffect(() => {
     const loadColors = async () => {
       try {
@@ -27,9 +29,9 @@ export default function ColorSliderScreen() {
     };
 
     loadColors();
-  }, []); // El array vacío [] significa que esto se ejecuta solo una vez al inicio
+  }, []); // significa que esto se ejecuta solo una vez al inicio
 
-  // 3. Hook para guardar los colores cada vez que cambian
+  // para guardar los colores cada vez que cambian
   useEffect(() => {
     const saveColors = async () => {
       try {
@@ -42,7 +44,7 @@ export default function ColorSliderScreen() {
     };
 
     saveColors();
-  }, [red, green, blue]); // Esto se ejecuta cada vez que 'red', 'green' o 'blue' cambian
+  }, [red, green, blue]); // se ejecuta cada vez que 'red', 'green' o 'blue' cambian
 
   // 4. Creamos el string de color para el fondo
   const backgroundColor = `rgb(${red}, ${green}, ${blue})`;
@@ -107,46 +109,21 @@ export default function ColorSliderScreen() {
   );
 }
 
-// 6. Estilos para los componentes
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  sliderGroup: {
-    backgroundColor: 'rgba(240, 240, 240, 0.8)',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  sliderRow: {
+  titleContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'white',
-    paddingHorizontal: 10,
-    paddingVertical: 2,
-    borderRadius: 5,
-    overflow: 'hidden', // Para que el borderRadius se aplique en Android
+  stepContainer: {
+    gap: 8,
+    marginBottom: 8,
   },
-  value: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    backgroundColor: 'white',
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  slider: {
-    width: '100%',
-    height: 40,
-    marginTop: 10,
+  reactLogo: {
+    height: 178,
+    width: 290,
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
   },
 });
