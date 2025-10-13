@@ -110,20 +110,44 @@ export default function ColorSliderScreen() {
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
+  sliderGroup: {
+    backgroundColor: 'rgba(240, 240, 240, 0.8)',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  sliderRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'white',
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+    borderRadius: 5,
+    overflow: 'hidden', // Para que el borderRadius se aplique en Android
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  value: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    backgroundColor: 'white',
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  slider: {
+    width: '100%',
+    height: 40,
+    marginTop: 10,
   },
 });
