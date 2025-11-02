@@ -1,4 +1,4 @@
-// Model - Maneja los datos y la lógica de negocio
+// Model
 import axios from 'axios';
 
 export interface Country {
@@ -46,18 +46,18 @@ export interface HistoricalData {
 class CovidModel {
   private baseURL = 'https://disease.sh/v3/covid-19';
 
-  // Obtener todos los países
+  //obtener los países
   async getAllCountries(): Promise<Country[]> {
     try {
       const response = await axios.get<Country[]>(`${this.baseURL}/countries`);
       return response.data.sort((a, b) => a.country.localeCompare(b.country));
     } catch (error) {
-      console.error('Error fetching countries:', error);
+      console.error('Error al obtener los países:', error);
       throw error;
     }
   }
 
-  // Obtener datos de un país específico
+  //buscar datos de un país específico
   async getCountryData(countryName: string): Promise<Country> {
     try {
       const response = await axios.get<Country>(
@@ -65,49 +65,88 @@ class CovidModel {
       );
       return response.data;
     } catch (error) {
-      console.error(`Error fetching data for ${countryName}:`, error);
+      console.error(`Error al buscar datos para ${countryName}:`, error);
       throw error;
     }
   }
 
-  // Obtener datos históricos de un país
+  //datos históricos de un país
   async getHistoricalData(
     countryName: string,
-    days: number = 30
+    days: number | 'all' = 30
   ): Promise<HistoricalData> {
     try {
       const response = await axios.get<HistoricalData>(
         `${this.baseURL}/historical/${countryName}?lastdays=${days}`
       );
+      console.log(`Datos históricos obtenidos para ${countryName}`);
       return response.data;
     } catch (error) {
-      console.error(`Error fetching historical data for ${countryName}:`, error);
+      console.error(`Error al obtener datos históricos para ${countryName}:`, error);
       throw error;
     }
   }
 
-  // Transformar datos históricos para la gráfica
-  transformHistoricalDataForChart(historicalData: HistoricalData) {
-    const cases = historicalData.timeline.cases;
-    const dates = Object.keys(cases);
-    const values = Object.values(cases);
+  //datos históricos de muertes por año para la gráfica
+  transformDeathsDataForChart(historicalData: HistoricalData) {
+    const deaths = historicalData.timeline.deaths;
+    const dates = Object.keys(deaths);
+    const values = Object.values(deaths);
 
-    // Tomar solo algunos puntos para que la gráfica sea más legible
-    const step = Math.ceil(dates.length / 10);
-    const labels = dates.filter((_, index) => index % step === 0).map((date) => {
-      const d = new Date(date);
-      return `${d.getMonth() + 1}/${d.getDate()}`;
-    });
+    if (dates.length === 0 || values.every(v => v === 0)) {
+      console.log('No hay datos válidos');
+      return {
+        labels: ['Sin datos'],
+        datasets: [{ data: [0], color: (opacity = 1) => `rgba(220, 53, 69, ${opacity})`, strokeWidth: 3 }],
+      };
+    }
+
+    // Agrupar por año
+    const deathsByYear: { [year: string]: number } = {};
     
-    const data = values.filter((_, index) => index % step === 0);
+    dates.forEach((date, index) => {
+      let year: number;
+      
+      // intentamos parsear la fecha en diferentes formatos
+      if (date.includes('/')) {
+        // Formato: "1/22/20" o "1/22/2020"
+        const parts = date.split('/');
+        const yearPart = parts[2];
+        year = yearPart.length === 2 ? 2000 + parseInt(yearPart) : parseInt(yearPart);
+      } else {
+        year = new Date(date).getFullYear();
+      }
+      
+      const yearStr = year.toString();
+      
+      //se guarda el valor máximo de cada año
+      if (!deathsByYear[yearStr] || values[index] > deathsByYear[yearStr]) {
+        deathsByYear[yearStr] = values[index];
+      }
+    });
+
+    //años desde 2020 en adelante
+    const years = Object.keys(deathsByYear)
+      .filter(year => parseInt(year) >= 2020)
+      .sort();
+    
+    const yearlyDeaths = years.map(year => deathsByYear[year]);
+
+    // Verificar que tengamos datos válidos
+    if (years.length === 0 || yearlyDeaths.every(d => d === 0)) {
+      return {
+        labels: ['Sin datos'],
+        datasets: [{ data: [0], color: (opacity = 1) => `rgba(220, 53, 69, ${opacity})`, strokeWidth: 3 }],
+      };
+    }
 
     return {
-      labels,
+      labels: years,
       datasets: [
         {
-          data,
-          color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
-          strokeWidth: 2,
+          data: yearlyDeaths,
+          color: (opacity = 1) => `rgba(220, 53, 69, ${opacity})`,
+          strokeWidth: 3,
         },
       ],
     };

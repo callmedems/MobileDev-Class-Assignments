@@ -1,4 +1,3 @@
-// Pantalla de detalles: Muestra información detallada del país con gráfica
 import CovidController from '@/controllers/CovidController';
 import { Country } from '@/models/CovidModel';
 import { CountryDetailView } from '@/views/CountryDetailView';
@@ -15,9 +14,6 @@ export default function ExploreScreen() {
   useEffect(() => {
     if (params.countryName) {
       loadCountryDetails(params.countryName as string);
-    } else {
-  
-      loadCountryDetails('Mexico');
     }
   }, [params.countryName]);
 
@@ -25,15 +21,15 @@ export default function ExploreScreen() {
     try {
       setLoading(true);
       
-      // Cargar datos actuales del país
+      //cargar datos actuales del país
       const countryData = await CovidController.loadCountryDetails(countryName);
       setCountry(countryData);
 
-      // Cargar datos históricos para la gráfica
-      const historicalData = await CovidController.loadHistoricalData(countryName, 30);
-      setChartData(historicalData);
+      //cargar datos de muertes por año para la gráfica
+      const deathsData = await CovidController.loadDeathsData(countryName);
+      setChartData(deathsData);
     } catch (error) {
-      console.error('Error loading country details:', error);
+      console.error('No se pudieron cargar los datos del país:', error);
     } finally {
       setLoading(false);
     }
@@ -42,7 +38,7 @@ export default function ExploreScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Covid19</Text>
+        <Text style={styles.headerTitle}>COVID 19</Text>
       </View>
       <CountryDetailView
         country={country}
@@ -57,10 +53,10 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'white',
   },
   header: {
-    backgroundColor: '#6200EE',
+    backgroundColor: 'purple',
     padding: 20,
     paddingTop: 60,
     alignItems: 'center',
@@ -68,6 +64,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
+    color: 'white',
   },
 });

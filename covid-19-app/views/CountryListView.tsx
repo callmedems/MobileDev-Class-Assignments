@@ -1,13 +1,14 @@
 // View - Lista de países con banderas
 import React from 'react';
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { Country } from '../models/CovidModel';
 
@@ -15,12 +16,16 @@ interface CountryListViewProps {
   countries: Country[];
   loading: boolean;
   onCountryPress: (country: Country) => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
 }
 
 export const CountryListView: React.FC<CountryListViewProps> = ({
   countries,
   loading,
   onCountryPress,
+  searchQuery,
+  onSearchChange,
 }) => {
   const renderCountryItem = ({ item }: { item: Country }) => {
     if (!item || !item.country) return null;
@@ -55,16 +60,44 @@ export const CountryListView: React.FC<CountryListViewProps> = ({
   }
 
   return (
-    <FlatList
-      data={countries}
-      renderItem={renderCountryItem}
-      keyExtractor={(item, index) => item.countryInfo?._id?.toString() || item.country || index.toString()}
-      contentContainerStyle={styles.listContainer}
-    />
+    <View style={styles.container}>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar país (en inglés)"
+          placeholderTextColor="gray"
+          value={searchQuery}
+          onChangeText={onSearchChange}
+        />
+      </View>
+      <FlatList
+        data={countries}
+        renderItem={renderCountryItem}
+        keyExtractor={(item, index) => item.countryInfo?._id?.toString() || item.country || index.toString()}
+        contentContainerStyle={styles.listContainer}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  searchContainer: {
+    backgroundColor: 'white',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgray',
+  },
+  searchInput: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: 'lightgray',
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -73,7 +106,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#666',
+    color: 'gray',
   },
   listContainer: {
     padding: 10,
@@ -81,11 +114,11 @@ const styles = StyleSheet.create({
   countryItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     padding: 15,
     marginVertical: 5,
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: 'black',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -103,11 +136,11 @@ const styles = StyleSheet.create({
   countryName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'black',
   },
   cases: {
     fontSize: 14,
-    color: '#666',
+    color: 'gray',
     marginTop: 4,
   },
 });

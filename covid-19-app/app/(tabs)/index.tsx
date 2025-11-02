@@ -8,7 +8,9 @@ import { StyleSheet, Text, View } from 'react-native';
 
 export default function HomeScreen() {
   const [countries, setCountries] = useState<Country[]>([]);
+  const [filteredCountries, setFilteredCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -20,10 +22,26 @@ export default function HomeScreen() {
       setLoading(true);
       const data = await CovidController.loadCountries();
       setCountries(data);
+      setFilteredCountries(data);
     } catch (error) {
       console.error('Error loading countries:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setFilteredCountries(countries);
+      return;
+    }
+    
+    try {
+      const results = await CovidController.searchCountries(query);
+      setFilteredCountries(results);
+    } catch (error) {
+      console.error('Error searching countries:', error);
     }
   };
 
@@ -45,9 +63,11 @@ export default function HomeScreen() {
         <Text style={styles.headerSubtitle}>Lista de Países</Text>
       </View>
       <CountryListView
-        countries={countries}
+        countries={filteredCountries}
         loading={loading}
         onCountryPress={handleCountryPress}
+        searchQuery={searchQuery}
+        onSearchChange={handleSearch}
       />
     </View>
   );

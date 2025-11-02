@@ -1,13 +1,13 @@
 // View - Detalles del país con gráfica
 import React from 'react';
 import {
-    ActivityIndicator,
-    Dimensions,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { Country } from '../models/CovidModel';
@@ -62,48 +62,48 @@ export const CountryDetailView: React.FC<CountryDetailViewProps> = ({
         </View>
       </View>
 
-      {chartData && (
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Casos Acumulados (últimos 30 días)</Text>
-          <LineChart
-            data={chartData}
-            width={Dimensions.get('window').width - 20}
-            height={220}
-            chartConfig={{
-              backgroundColor: '#6200EE',
-              backgroundGradientFrom: '#6200EE',
-              backgroundGradientTo: '#9D4EDD',
-              decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-              propsForDots: {
-                r: '4',
-                strokeWidth: '2',
-                stroke: '#fff',
-              },
-            }}
-            bezier
-            style={styles.chart}
-          />
-        </View>
-      )}
-
-      <View style={styles.additionalStats}>
-        <View style={styles.additionalStatRow}>
-          <Text style={styles.additionalStatLabel}>Casos activos:</Text>
-          <Text style={styles.additionalStatValue}>{formatNumber(country.active || 0)}</Text>
-        </View>
-        <View style={styles.additionalStatRow}>
-          <Text style={styles.additionalStatLabel}>Críticos:</Text>
-          <Text style={styles.additionalStatValue}>{formatNumber(country.critical || 0)}</Text>
-        </View>
-        <View style={styles.additionalStatRow}>
-          <Text style={styles.additionalStatLabel}>Tests realizados:</Text>
-          <Text style={styles.additionalStatValue}>{formatNumber(country.tests || 0)}</Text>
-        </View>
+      <View style={styles.chartContainer}>
+        <Text style={styles.chartTitle}>Muertes por Año</Text>
+        {chartData && chartData.labels.length > 1 && (
+          <Text style={styles.chartSubtitle}>Desliza para ver todos los años</Text>
+        )}
+        {chartData ? (
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={true}
+            style={styles.chartScrollView}
+          >
+            <LineChart
+              data={chartData}
+              width={Math.max(Dimensions.get('window').width - 20, chartData.labels.length * 100)}
+              height={250}
+              chartConfig={{
+                backgroundColor: 'red',
+                backgroundGradientFrom: 'firebrick',
+                backgroundGradientTo: 'tomato',
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                style: {
+                  borderRadius: 16,
+                },
+                propsForDots: {
+                  r: '6',
+                  strokeWidth: '2',
+                  stroke: 'white',
+                },
+              }}
+              bezier
+              style={styles.chart}
+            />
+          </ScrollView>
+        ) : (
+          <View style={styles.noDataContainer}>
+            <Text style={styles.noDataText}>
+              No hay datos históricos disponibles para este país
+            </Text>
+          </View>
+        )}
       </View>
     </ScrollView>
   );
@@ -112,7 +112,7 @@ export const CountryDetailView: React.FC<CountryDetailViewProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'white',
   },
   loadingContainer: {
     flex: 1,
@@ -122,12 +122,12 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#666',
+    color: 'black',
   },
   header: {
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor:'white',
   },
   flag: {
     width: 120,
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   countryName: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'black',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -151,30 +151,30 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: 'black',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   casesCard: {
-    backgroundColor: '#FFE5E5',
+    backgroundColor: 'white',
   },
   recoveredCard: {
-    backgroundColor: '#E5F7E5',
+    backgroundColor: 'white',
   },
   deathsCard: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'white',
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
+    color: 'black',
     marginBottom: 5,
   },
   statValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'black',
   },
   chartContainer: {
     padding: 10,
@@ -182,40 +182,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   chartTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'black',
+    marginBottom: 5,
+  },
+  chartSubtitle: {
+    fontSize: 12,
+    color: 'gray',
     marginBottom: 10,
+    fontStyle: 'italic',
+  },
+  chartScrollView: {
+    marginVertical: 10,
   },
   chart: {
     marginVertical: 8,
     borderRadius: 16,
+    marginBottom: 20,
   },
-  additionalStats: {
-    backgroundColor: '#fff',
-    margin: 10,
-    padding: 15,
+  noDataContainer: {
+    backgroundColor: 'white',
+    padding: 20,
     borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    margin: 10,
+    alignItems: 'center',
   },
-  additionalStatRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  additionalStatLabel: {
+  noDataText: {
     fontSize: 14,
-    color: '#666',
-  },
-  additionalStatValue: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
+    color: 'gray',
+    textAlign: 'center',
   },
 });
